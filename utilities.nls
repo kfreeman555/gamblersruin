@@ -1,0 +1,250 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;various NetLogo utilities
+;Copyright (c) 2016 Alan G. Isaac. All rights reserved.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+to-report r2d [#r] ;radians to degrees
+  report 180 * #r / pi
+end
+
+to-report d2r [#d] ;degrees to radians
+  report #d * pi / 180
+end
+
+;;;;;;;;;;;; logical utlities
+to-report allTrue [#lst]
+  report ifelse-value (empty? #lst) [true] [reduce and #lst]
+end
+
+to-report anyTrue [#lst]
+  report ifelse-value (empty? #lst) [false] [reduce or #lst]
+end
+
+;;;;;;;;;;;; random number utlities
+;BEGIN:bernoulli
+to-report bernoulli [#p]
+  let _u (random-float 1)
+  report ifelse-value (_u < #p) [1] [0]
+end
+;END:bernoulli
+
+;BEGIN:randomPairs
+to-report randomPairs [#lst]
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;; Report a list of lists (random pairs).
+  ;; Each item is used once
+  ;; unless there is an odd number of items,
+  ;; in which case one item is not used.
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  report partition (shuffle #lst) 2
+end
+;END:randomPairs
+
+
+to-report random-unique-pairs [
+  #n     ;(int) : number of pairs
+  #lst01 ;(list) : possible first coordinates
+  #lst02 ;(list) : possible second coordinates
+  ]
+  let _n1 length #lst01
+  let _n2 length #lst02
+  let _nmax (_n1 * _n2) ;max possible unique pairs
+  if (#n > _n1 * _n2) [error "#n is too big"]
+  let _idxs n-of #n (n-values _nmax  [?])
+  report map [(list 
+      item int (? / _n2) #lst01
+      item (? mod _n2) #lst02)
+    ] _idxs
+end
+
+;;;;;;;;;;;list utilities
+
+;BEGIN:linspace
+to-report linspace [
+  #xmin ;(number) : left interval endpt
+  #xmax ;(number) : right interval endpt
+  #npts ;(int)    : number of pts (2 or more)
+  ]
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;;Report list, `#npts` evenly spaced pts in an interal, ;;
+  ;;from `#xmin` to `#xmax`, enpoints included.           ;;
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  let _len (#xmax - #xmin)                 ;;interval length
+  if (_len <= 0) [error "not an interval"]
+  set #npts int #npts
+  ;; producing the list of points:
+  let _result []    ;default (applies if #npts < 1)
+  if (#npts = 1) [  ;special case (match numpy, not Matlab)
+    set _result (list #xmin)
+  ]
+  if (#npts > 1) [
+    set _result n-values #npts [#xmin + _len * (? / (#npts - 1))]
+  ]
+  report _result
+end
+;END:linspace
+
+;BEGIN:nestList
+to-report nestList [
+  #f  ;(task)   : the function to iterate
+  #x0 ;(number) : the initial value
+  #n  ;(int)    : the number of iterations
+  ]
+  let _x #x0
+  let _xs (list _x)
+  repeat #n [
+    set _x (runresult #f _x)
+    set _xs (lput _x _xs)
+  ]
+  report _xs
+end
+;END:nestList
+
+
+;BEGIN:fstepPoints
+to-report fstepPoints [
+  #pts ;(list of lists) : the initial set of points
+  ]
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;;Report list of lists, all the original `#pts`
+  ;;with fsteps between them.  For example, between
+  ;;(x0,y0) and (x1,y1) will be (x0,y1).
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  let _pt0 first #pts      ;get the first point
+  let _fpts lput _pt0 []   ;add the first point to our list
+  let _x0 first _pt0
+  foreach butfirst #pts [
+    let _fstep fput _x0 butfirst ?   ;create fstep as [x0 y1]
+    set _fpts lput _fstep _fpts      ;add the fstep to our list
+    set _fpts lput  ? _fpts          ;add the point to our list
+    set _x0 first ?
+  ]
+  report _fpts
+end
+;END:fstepPoints
+
+
+to-report random-sublist [#lst]
+  report filter (task [one-of [true false]]) #lst
+end
+
+to-report binary-to-integer [bits] 
+  report reduce [?1 * 2 + ?2] bits 
+end
+
+to-report string-to-digits [#s]
+  let _idxs n-values length #s [?]
+  report map [read-from-string item ? #s] _idxs
+end
+
+;BEGIN:zip
+to-report zip [#lst1 #lst2]
+  let _len min (list length #lst1 length #lst2)
+  set #lst1 sublist #lst1 0 _len
+  set #lst2 sublist #lst2 0 _len
+  report (map [list ?1 ?2] #lst1 #lst2)
+end
+;END:zip
+
+;BEGIN:partition
+to-report partition [
+  #lst  ; (list) : the list to partition
+  #n    ; (int) : the length of each nested list
+  ;NOTE: all sublists have length #n (remaining items discarded)
+  ]
+  let _len length #lst
+  if (#n < 1 or #n != int #n) [error "#n must be a postive integer"]
+  let _result []
+  let _nparts floor (_len / #n)
+  foreach n-values _nparts [?] [
+    let _start (? * #n)
+    let _stop (_start + #n)
+    set _result lput (sublist #lst _start _stop) _result
+  ]
+  report _result
+end
+;END:partition
+
+;;note we use the Mma convention (list arg first) not the Haskell convention
+to-report take [#xs #n]
+  if (#n < 1 or #n != int #n) [error "#n must be a postive int"]
+  let _len length #xs
+  if (_len < #n) [error "not enough elements to take"]
+  report sublist #xs 0 #n
+end
+
+to-report drop [#xs #n]
+  ;drop first #n elements of #xs
+  if (#n < 1 or #n != int #n) [error "#n must be a postive int"]
+  let _len length #xs
+  if (_len < #n) [error "not enough elements to drop"]
+  report sublist #xs #n _len
+end
+
+to-report partition02 [
+  #lst  ; (list) : the list to partition
+  #n    ; (int) : the length of each nested list
+  ;NOTE: all sublists have length #n (remaining items discarded)
+  ]
+  report ifelse-value (#n > length #lst) [
+    []
+  ][
+    fput (take #lst #n) (partition drop #lst #n #n)
+  ]
+end
+
+;;;;;;;;;;; plotting utilities
+
+to tsLinePlot [
+  #id ;(string) : the name of the plot
+  #xs ;(list of numbers) : the series to plot
+  ]
+  set-current-plot #id
+  foreach #xs [
+    plot ?
+  ]
+end
+
+to runSequencePlot [
+  #id ;(string) : the name of the plot
+  #xs ;(list of numbers) : the series to plot
+  ]
+  set-current-plot #id
+  foreach #xs [
+    plot ?
+  ]
+end
+
+;BEGIN:pointsLinePlot
+to pointsLinePlot [
+  #id  ;(string) : the name of the plot
+  #pts ;(list)   : list of lists, the points to plot
+  ]
+  set-current-plot #id
+  foreach #pts [
+    plotxy item 0 ? item 1 ?
+  ]
+end
+;END:pointsLinePlot
+
+to-report functionPoints [
+  #task    ;(task) : univariate function
+  #domain  ;(list) : points for function evaluation
+  ]
+  report map [list ? (runresult #task ?)] #domain
+end
+
+to functionLinePlot [
+  #id   ;(string) : the name of the plot
+  #f    ;(task)   : the function to be plotted
+  #xmin ;(float)  : the first domain point to plot
+  #xmax ;(float)  : the last domain point to plot
+  #npts ;(int)    : the number of points to plot
+  ]
+  ;create the domain
+  let _domain linspace #xmin #xmax #npts
+  ;get the function points for this domain
+  let _pts functionPoints #f _domain
+  ;plot the points
+  pointsLinePlot _pts #id
+end
