@@ -19,6 +19,8 @@
 
 __includes["utilities.nls"] ;utilities.nls provided by Alan G. Isaac
 
+turtles-own[wealth]
+
 ;------------------------;;;;;;;;;;;;;;;;;;;;;------------------------;
 ;------------------------;;   BEGIN Setup   ;;------------------------;
 ;------------------------;;;;;;;;;;;;;;;;;;;;;------------------------;
@@ -26,6 +28,22 @@ __includes["utilities.nls"] ;utilities.nls provided by Alan G. Isaac
 
 
 ;------------------------------END Setup------------------------------;
+
+;------------------------;;;;;;;;;;;;;;;;;;;;;------------------------;
+;------------------------;;   BEGIN Test    ;;------------------------;
+;------------------------;;;;;;;;;;;;;;;;;;;;;------------------------;
+
+to testpt1
+  ;;
+  ;; Create two agents, each with wealth of 100 and use the code written
+  ;; so far to have them play a two-player gambler's ruin. Afterwards,
+  ;; determine the wealths of your two players (should sum to 200)
+  ;;
+end
+
+
+;------------------------------END Test-------------------------------;
+
 
 
 ;------------------------;;;;;;;;;;;;;;;;;;;;;------------------------;
@@ -36,6 +54,8 @@ to ruin2player00 [#players]
   ;;
   ;; Code provided by Alan G. Isaac
   ;;
+  ;; Calls: playOnce, playOn
+  ;;
 
   let _itr 0
   while [playOn00 #players _itr] [
@@ -45,7 +65,23 @@ to ruin2player00 [#players]
 end
 
 to transfer00 [#fr #to #amt]
+  ;;
+  ;; Calls: has no dependencies
+  ;;
+  ;; TODO: Create a new implementation of the transfer procedure that raises
+  ;;       a runtime error if the transfer amount is negative
+  ;;
+  ;; TODO: Create a new implementation of the transfer procedure that raises
+  ;;       a runtime error if the transfer will push the welath of an agent
+  ;;       below 0.
+  ;;
+
+  let _wfr [wealth] of #fr
+  ask #fr [set wealth (_wfr - #amt)]
+  let _wto [wealth] of #to
+  ask #to [set wealth (_wto + #amt)]
 end
+
 
 ;----------------------------END Procedure----------------------------;
 
@@ -57,6 +93,8 @@ end
 
 to-report playOn00 [#players #iteration]
   ;;
+  ;; Calls: Has no dependencies (so far)
+  ;;
   ;; TODO
   ;;
 
@@ -66,6 +104,8 @@ end
 to-report playOnce00 [#players] ; (list): the two players
   ;;
   ;; Code provided by Alan G. Isaac
+  ;;
+  ;; Calls: transfer
   ;;
 
   let _p1 first #players
