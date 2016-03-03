@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;; Gambler's Ruin 01
 ;; ruin01.netlogo
@@ -15,10 +15,95 @@
 ;; Project Git:
 ;; https://github.com/kfreeman555/gamblersruin
 ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-__includes["utilities.nls"]
+__includes["utilities.nls"] ;utilities.nls provided by Alan G. Isaac
 
+;------------------------;;;;;;;;;;;;;;;;;;;;;------------------------;
+;------------------------;;   BEGIN Setup   ;;------------------------;
+;------------------------;;;;;;;;;;;;;;;;;;;;;------------------------;
+
+
+
+;------------------------------END Setup------------------------------;
+
+
+;------------------------;;;;;;;;;;;;;;;;;;;;;------------------------;
+;------------------------;; BEGIN Procedure ;;------------------------;
+;------------------------;;;;;;;;;;;;;;;;;;;;;------------------------;
+
+to ruin2player00 [#players]
+  ;;
+  ;; Code provided by Alan G. Isaac
+  ;;
+
+  let _itr 0
+  while [playOn00 #players _itr] [
+    set #players (playOnce00 #players)
+    set _itr (_itr + 1)
+  ]
+end
+
+to transfer00 [#fr #to #amt]
+end
+
+;----------------------------END Procedure----------------------------;
+
+
+
+;------------------------;;;;;;;;;;;;;;;;;;;;;------------------------;
+;------------------------;; BEGIN Reporters ;;------------------------;
+;------------------------;;;;;;;;;;;;;;;;;;;;;------------------------;
+
+to-report playOn00 [#players #iteration]
+  ;;
+  ;; TODO
+  ;;
+
+  if #iteration < 10 []
+end
+
+to-report playOnce00 [#players] ; (list): the two players
+  ;;
+  ;; Code provided by Alan G. Isaac
+  ;;
+
+  let _p1 first #players
+  let _p2 last #players
+  let _payoff one-of [1 -1]
+  ifelse (_payoff > 0) [
+    transfer00 _p2 _p1 _payoff
+  ] [
+    transfer00 _p1 _p2 (- _payoff)
+  ]
+  report #players
+
+end
+
+to-report simple2player [
+  ;;
+  ;; Code provided by Alan G. Isaac
+  ;;
+
+  #w1 ;(number) : wealth of player 1
+  #w2 ;(number) : wealth of player 2
+  ]
+  ;Report list of lists, the players' wealth history.
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  let _history (list (list #w1 #w2) )
+  let _maxiter (#w1 * #w2)
+  let _itr 0
+  while [(_itr < _maxiter) and (#w1 > 0) and (#w2 > 0)] [
+    set _itr (_itr + 1)
+    let _pay1 one-of [1 -1]
+    set #w1 (#w1 + _pay1)
+    set #w2 (#w2 - _pay1)
+    set _history lput (list #w1 #w2) _history
+  ]
+  report _history
+end
+
+;----------------------------END Reporters----------------------------;
 @#$#@#$#@
 GRAPHICS-WINDOW
 210
