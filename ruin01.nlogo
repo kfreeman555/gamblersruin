@@ -1,4 +1,24 @@
-; This is a test for Git Hub
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; Gambler's Ruin 01
+;; ruin01.netlogo
+;;
+;; Kade Freeman
+;; ECON-450-001
+;; 14 March 2016
+;;
+;; Instructor:
+;; Alan G. Isaac
+;; Department of Economics
+;; American University
+;;
+;; Project Git:
+;; https://github.com/kfreeman555/gamblersruin
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+__includes["utilities.nls"]
+
 @#$#@#$#@
 GRAPHICS-WINDOW
 210
