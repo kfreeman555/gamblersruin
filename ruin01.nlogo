@@ -25,7 +25,11 @@ turtles-own[wealth]
 ;------------------------;;   BEGIN Setup   ;;------------------------;
 ;------------------------;;;;;;;;;;;;;;;;;;;;;------------------------;
 
+to setup
+  ca
+  create-turtles 2
 
+end
 
 ;------------------------------END Setup------------------------------;
 
@@ -72,7 +76,7 @@ to transfer00 [#fr #to #amt]
   ;;       a runtime error if the transfer amount is negative
   ;;
   ;; TODO: Create a new implementation of the transfer procedure that raises
-  ;;       a runtime error if the transfer will push the welath of an agent
+  ;;       a runtime error if the transfer will push the wealth of an agent
   ;;       below 0.
   ;;
 
@@ -82,6 +86,42 @@ to transfer00 [#fr #to #amt]
   ask #to [set wealth (_wto + #amt)]
 end
 
+to transfer [
+  #fr  ;(player) : fromplayer identifier
+  #to  ;(player) : toplayer identifer
+  #amt ;(number) : amount to transfer from `#fr` to `#to`
+  ]
+
+  ;
+  ; CALLS: procedure setWealth
+  ;        reporter  getWealth
+  ;
+  ; Transfers some 'wealth' attribute from one agent to another
+  ;
+
+  setWealth #fr (getWealth #fr - #amt)
+  setWealth #to (getWealth #to + #amt)
+end
+
+to setWealth [id amt]
+  ;
+  ; Asks an agent, identified by its id (ex: turtle 0)
+  ; and sets its 'wealth' variable to the specified 'amt',
+  ; expecting it to be a numerical value.
+  ;
+
+  ask id [set wealth amt]
+end
+
+to-report getWealth [id]
+  ;
+  ; Reports the wealth of an agent, identified by it's id
+  ; ex: getWealth turtle 0
+  ;
+
+  let _gotWealth [wealth] of id
+  report _gotWealth
+end
 
 ;----------------------------END Procedure----------------------------;
 
