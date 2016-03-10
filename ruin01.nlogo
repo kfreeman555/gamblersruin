@@ -28,7 +28,7 @@ turtles-own[wealth]
 to setup
   ca
   create-turtles 2
-
+  ask turtles [set wealth 100]
 end
 
 ;------------------------------END Setup------------------------------;
@@ -43,6 +43,10 @@ to testpt1
   ;; so far to have them play a two-player gambler's ruin. Afterwards,
   ;; determine the wealths of your two players (should sum to 200)
   ;;
+
+  setup
+  ruin2player00 2
+  show [wealth] of turtles
 end
 
 
@@ -135,10 +139,11 @@ to-report playOn00 [#players #iteration]
   ;;
   ;; Calls: Has no dependencies (so far)
   ;;
+  ;;
   ;; TODO
   ;;
 
-  if #iteration < 10 []
+  report (#iteration < 10) ;TODO! Fix this test!
 end
 
 to-report playOnce00 [#players] ; (list): the two players
