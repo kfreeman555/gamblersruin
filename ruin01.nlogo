@@ -43,9 +43,10 @@ to testpt1
   ;; so far to have them play a two-player gambler's ruin. Afterwards,
   ;; determine the wealths of your two players (should sum to 200)
   ;;
-
-  setup
-  ruin2player00 2
+  let _lst[]
+  set _lst list(turtle 0) (turtle 1)
+  show _lst
+  ask turtles [ruin2player00 _lst]
   show [wealth] of turtles
 end
 
@@ -114,17 +115,7 @@ to setWealth [id amt]
   ; expecting it to be a numerical value.
   ;
 
-  ask id [set wealth amt]
-end
-
-to-report getWealth [id]
-  ;
-  ; Reports the wealth of an agent, identified by it's id
-  ; ex: getWealth turtle 0
-  ;
-
-  let _gotWealth [wealth] of id
-  report _gotWealth
+  set wealth amt
 end
 
 ;----------------------------END Procedure----------------------------;
@@ -135,6 +126,17 @@ end
 ;------------------------;; BEGIN Reporters ;;------------------------;
 ;------------------------;;;;;;;;;;;;;;;;;;;;;------------------------;
 
+to-report getWealth [#id]
+  ;
+  ; Reports the wealth of an agent, identified by it's id
+  ; ex: getWealth turtle 0
+  ;
+
+  let _gotWealth #id
+  set _gotWealth wealth
+  report _gotWealth
+end
+
 to-report playOn00 [#players #iteration]
   ;;
   ;; Calls: Has no dependencies (so far)
@@ -142,8 +144,7 @@ to-report playOn00 [#players #iteration]
   ;;
   ;; TODO
   ;;
-
-  report (#iteration < 10) ;TODO! Fix this test!
+  if-else #iteration < 10 [report false][report true] ;TODO! Fix this test!
 end
 
 to-report playOnce00 [#players] ; (list): the two players
@@ -157,9 +158,9 @@ to-report playOnce00 [#players] ; (list): the two players
   let _p2 last #players
   let _payoff one-of [1 -1]
   ifelse (_payoff > 0) [
-    transfer00 _p2 _p1 _payoff
+    transfer _p2 _p1 _payoff
   ] [
-    transfer00 _p1 _p2 (- _payoff)
+    transfer _p1 _p2 (- _payoff)
   ]
   report #players
 
